@@ -17,26 +17,28 @@ import "./styles.css";
 const TEMPLATE_URL = "/complte-one-template.xlsx";
 const STORAGE_KEY = "response-sheet-app-v1";
 const ANSWER_FIELDS = [
-  { key: "correctnessClaude", label: "Correctness", cell: "AB", model: "Claude", type: "yesno" },
-  { key: "correctnessGpt", label: "Correctness", cell: "AC", model: "GPT5", type: "yesno" },
-  { key: "correctnessDeepSeek", label: "Correctness", cell: "AD", model: "DeepSeek", type: "yesno" },
-  { key: "relevanceClaude", label: "Requirement Relevance", cell: "AE", model: "Claude", type: "yesno" },
-  { key: "relevanceGpt", label: "Requirement Relevance", cell: "AF", model: "GPT5", type: "yesno" },
-  { key: "relevanceDeepSeek", label: "Requirement Relevance", cell: "AG", model: "DeepSeek", type: "yesno" },
-  { key: "ambiguityClaude", label: "Ambiguity Word Count", cell: "AH", model: "Claude", type: "number" },
-  { key: "ambiguityGpt", label: "Ambiguity Word Count", cell: "AI", model: "GPT5", type: "number" },
-  { key: "ambiguityDeepSeek", label: "Ambiguity Word Count", cell: "AJ", model: "DeepSeek", type: "number" },
-  { key: "readabilityClaude", label: "Readability", cell: "AK", model: "Claude", type: "yesno" },
-  { key: "readabilityGpt", label: "Readability", cell: "AL", model: "GPT5", type: "yesno" },
-  { key: "readabilityDeepSeek", label: "Readability", cell: "AM", model: "DeepSeek", type: "yesno" },
-  { key: "semanticClaude", label: "Semantic Similarity", cell: "AN", model: "Claude", type: "scale" },
-  { key: "semanticGpt", label: "Semantic Similarity", cell: "AO", model: "GPT5", type: "scale" },
-  { key: "semanticDeepSeek", label: "Semantic Similarity", cell: "AP", model: "DeepSeek", type: "scale" },
+  { key: "correctnessClaude", label: "Correctness", cell: "AH", model: "Claude", type: "yesno" },
+  { key: "correctnessGpt", label: "Correctness", cell: "AI", model: "GPT5", type: "yesno" },
+  { key: "correctnessGemini", label: "Correctness", cell: "AJ", model: "Gemini", type: "yesno" },
+  { key: "correctnessDeepSeek", label: "Correctness", cell: "AK", model: "DeepSeek", type: "yesno" },
+  { key: "relevanceClaude", label: "Requirement Relevance", cell: "AL", model: "Claude", type: "yesno" },
+  { key: "relevanceGpt", label: "Requirement Relevance", cell: "AM", model: "GPT5", type: "yesno" },
+  { key: "relevanceGemini", label: "Requirement Relevance", cell: "AN", model: "Gemini", type: "yesno" },
+  { key: "relevanceDeepSeek", label: "Requirement Relevance", cell: "AO", model: "DeepSeek", type: "yesno" },
+  { key: "readabilityClaude", label: "Readability", cell: "AP", model: "Claude", type: "yesno" },
+  { key: "readabilityGpt", label: "Readability", cell: "AQ", model: "GPT5", type: "yesno" },
+  { key: "readabilityGemini", label: "Readability", cell: "AR", model: "Gemini", type: "yesno" },
+  { key: "readabilityDeepSeek", label: "Readability", cell: "AS", model: "DeepSeek", type: "yesno" },
+  { key: "semanticClaude", label: "Semantic Similarity", cell: "AT", model: "Claude", type: "scale" },
+  { key: "semanticGpt", label: "Semantic Similarity", cell: "AU", model: "GPT5", type: "scale" },
+  { key: "semanticGemini", label: "Semantic Similarity", cell: "AV", model: "Gemini", type: "scale" },
+  { key: "semanticDeepSeek", label: "Semantic Similarity", cell: "AW", model: "DeepSeek", type: "scale" },
 ];
-const MODEL_NAMES = ["Claude", "GPT5", "DeepSeek"];
+const MODEL_NAMES = ["Claude", "GPT5", "Gemini", "DeepSeek"];
 const VALID_COUNT_CELLS = {
-  Claude: { fr: "V", nfr: "W" },
-  DeepSeek: { fr: "X", nfr: "Y" },
+  Claude: { fr: "AB", nfr: "AC" },
+  DeepSeek: { fr: "AD", nfr: "AE" },
+  Gemini: { fr: "AF", nfr: "AG" },
   GPT5: { fr: "Z", nfr: "AA" },
 };
 
@@ -79,7 +81,8 @@ function parseRows(workbook) {
       story: cellText(sheet, `E${excelRow}`),
       claude: cellText(sheet, `F${excelRow}`),
       gpt: cellText(sheet, `G${excelRow}`),
-      deepseek: cellText(sheet, `H${excelRow}`),
+      gemini: cellText(sheet, `H${excelRow}`),
+      deepseek: cellText(sheet, `I${excelRow}`),
     });
   }
   return rows;
@@ -136,7 +139,7 @@ function requirementKey(model, type, index) {
 }
 
 function countValidRequirements(row, answer, model) {
-  const textByModel = { Claude: row.claude, GPT5: row.gpt, DeepSeek: row.deepseek };
+  const textByModel = { Claude: row.claude, GPT5: row.gpt, Gemini: row.gemini, DeepSeek: row.deepseek };
   const validity = answer?.requirementValidity || {};
   return splitRequirementText(textByModel[model]).reduce(
     (counts, section) => {
@@ -407,6 +410,14 @@ function App() {
             <ModelOutput
               name="GPT5"
               text={activeRow.gpt}
+              answer={answers[activeRow.excelRow]}
+              onValidityChange={(key, value) =>
+                saveAnswer(activeRow.excelRow, { requirementValidity: { [key]: value } })
+              }
+            />
+            <ModelOutput
+              name="Gemini"
+              text={activeRow.gemini}
               answer={answers[activeRow.excelRow]}
               onValidityChange={(key, value) =>
                 saveAnswer(activeRow.excelRow, { requirementValidity: { [key]: value } })
