@@ -240,7 +240,21 @@ pre {
 .requirement-list .choice-buttons button {
   min-height: 36px;
   font-size: 13px;
-  text-transform: capitalize;
+}
+.requirement-checks {
+  display: grid;
+  gap: 8px;
+}
+.requirement-check {
+  display: grid;
+  grid-template-columns: minmax(110px, 1fr) minmax(150px, 1.2fr);
+  align-items: center;
+  gap: 10px;
+}
+.requirement-check span {
+  color: #34433a;
+  font-size: 13px;
+  font-weight: 800;
 }
 .requirement-sections {
   display: grid;

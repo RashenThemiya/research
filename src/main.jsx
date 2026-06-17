@@ -17,30 +17,50 @@ import "./styles.css";
 const TEMPLATE_URL = "/complte-one-template.xlsx";
 const STORAGE_KEY = "response-sheet-app-v1";
 const ANSWER_FIELDS = [
-  { key: "correctnessClaude", label: "Correctness", cell: "AH", model: "Claude", type: "yesno" },
-  { key: "correctnessGpt", label: "Correctness", cell: "AI", model: "GPT5", type: "yesno" },
-  { key: "correctnessGemini", label: "Correctness", cell: "AJ", model: "Gemini", type: "yesno" },
-  { key: "correctnessDeepSeek", label: "Correctness", cell: "AK", model: "DeepSeek", type: "yesno" },
-  { key: "relevanceClaude", label: "Requirement Relevance", cell: "AL", model: "Claude", type: "yesno" },
-  { key: "relevanceGpt", label: "Requirement Relevance", cell: "AM", model: "GPT5", type: "yesno" },
-  { key: "relevanceGemini", label: "Requirement Relevance", cell: "AN", model: "Gemini", type: "yesno" },
-  { key: "relevanceDeepSeek", label: "Requirement Relevance", cell: "AO", model: "DeepSeek", type: "yesno" },
-  { key: "readabilityClaude", label: "Readability", cell: "AP", model: "Claude", type: "yesno" },
-  { key: "readabilityGpt", label: "Readability", cell: "AQ", model: "GPT5", type: "yesno" },
-  { key: "readabilityGemini", label: "Readability", cell: "AR", model: "Gemini", type: "yesno" },
-  { key: "readabilityDeepSeek", label: "Readability", cell: "AS", model: "DeepSeek", type: "yesno" },
-  { key: "semanticClaude", label: "Semantic Similarity", cell: "AT", model: "Claude", type: "scale" },
-  { key: "semanticGpt", label: "Semantic Similarity", cell: "AU", model: "GPT5", type: "scale" },
-  { key: "semanticGemini", label: "Semantic Similarity", cell: "AV", model: "Gemini", type: "scale" },
-  { key: "semanticDeepSeek", label: "Semantic Similarity", cell: "AW", model: "DeepSeek", type: "scale" },
+  { key: "completenessClaude", label: "Completeness", cell: "AY", model: "Claude", type: "scale" },
+  { key: "completenessGpt", label: "Completeness", cell: "AZ", model: "GPT5", type: "scale" },
+  { key: "completenessGemini", label: "Completeness", cell: "BA", model: "Gemini", type: "scale" },
+  { key: "completenessDeepSeek", label: "Completeness", cell: "BB", model: "DeepSeek", type: "scale" },
+  { key: "relevanceClaude", label: "Requirement Relevance", cell: "BC", model: "Claude", type: "scale" },
+  { key: "relevanceGpt", label: "Requirement Relevance", cell: "BD", model: "GPT5", type: "scale" },
+  { key: "relevanceGemini", label: "Requirement Relevance", cell: "BE", model: "Gemini", type: "scale" },
+  { key: "relevanceDeepSeek", label: "Requirement Relevance", cell: "BF", model: "DeepSeek", type: "scale" },
+  { key: "readabilityClaude", label: "Readability", cell: "BG", model: "Claude", type: "scale" },
+  { key: "readabilityGpt", label: "Readability", cell: "BH", model: "GPT5", type: "scale" },
+  { key: "readabilityGemini", label: "Readability", cell: "BI", model: "Gemini", type: "scale" },
+  { key: "readabilityDeepSeek", label: "Readability", cell: "BJ", model: "DeepSeek", type: "scale" },
+  { key: "semanticClaude", label: "Semantic Similarity", cell: "BK", model: "Claude", type: "scale" },
+  { key: "semanticGpt", label: "Semantic Similarity", cell: "BL", model: "GPT5", type: "scale" },
+  { key: "semanticGemini", label: "Semantic Similarity", cell: "BM", model: "Gemini", type: "scale" },
+  { key: "semanticDeepSeek", label: "Semantic Similarity", cell: "BN", model: "DeepSeek", type: "scale" },
 ];
 const MODEL_NAMES = ["Claude", "GPT5", "Gemini", "DeepSeek"];
-const VALID_COUNT_CELLS = {
-  Claude: { fr: "AB", nfr: "AC" },
-  DeepSeek: { fr: "AD", nfr: "AE" },
-  Gemini: { fr: "AF", nfr: "AG" },
-  GPT5: { fr: "Z", nfr: "AA" },
-};
+const REQUIREMENT_SUMMARY_FIELDS = [
+  { metric: "contentValid", label: "Content Valid?", model: "Claude", type: "fr", cell: "AA" },
+  { metric: "contentValid", label: "Content Valid?", model: "Claude", type: "nfr", cell: "AB" },
+  { metric: "contentValid", label: "Content Valid?", model: "GPT5", type: "fr", cell: "AC" },
+  { metric: "contentValid", label: "Content Valid?", model: "GPT5", type: "nfr", cell: "AD" },
+  { metric: "contentValid", label: "Content Valid?", model: "Gemini", type: "fr", cell: "AE" },
+  { metric: "contentValid", label: "Content Valid?", model: "Gemini", type: "nfr", cell: "AF" },
+  { metric: "contentValid", label: "Content Valid?", model: "DeepSeek", type: "fr", cell: "AG" },
+  { metric: "contentValid", label: "Content Valid?", model: "DeepSeek", type: "nfr", cell: "AH" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "Claude", type: "fr", cell: "AI" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "Claude", type: "nfr", cell: "AJ" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "GPT5", type: "fr", cell: "AK" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "GPT5", type: "nfr", cell: "AL" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "Gemini", type: "fr", cell: "AM" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "Gemini", type: "nfr", cell: "AN" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "DeepSeek", type: "fr", cell: "AO" },
+  { metric: "ambiguous", label: "Ambiguous?", model: "DeepSeek", type: "nfr", cell: "AP" },
+  { metric: "duplicate", label: "Duplicate?", model: "Claude", type: "fr", cell: "AQ" },
+  { metric: "duplicate", label: "Duplicate?", model: "Claude", type: "nfr", cell: "AR" },
+  { metric: "duplicate", label: "Duplicate?", model: "GPT5", type: "fr", cell: "AS" },
+  { metric: "duplicate", label: "Duplicate?", model: "GPT5", type: "nfr", cell: "AT" },
+  { metric: "duplicate", label: "Duplicate?", model: "Gemini", type: "fr", cell: "AU" },
+  { metric: "duplicate", label: "Duplicate?", model: "Gemini", type: "nfr", cell: "AV" },
+  { metric: "duplicate", label: "Duplicate?", model: "DeepSeek", type: "fr", cell: "AW" },
+  { metric: "duplicate", label: "Duplicate?", model: "DeepSeek", type: "nfr", cell: "AX" },
+];
 
 function readStore() {
   try {
@@ -138,18 +158,34 @@ function requirementKey(model, type, index) {
   return `${model}:${type}:${index}`;
 }
 
-function countValidRequirements(row, answer, model) {
+function requirementMetricKey(model, type, index, metric) {
+  return `${requirementKey(model, type, index)}:${metric}`;
+}
+
+function countRequirementSummaries(row, answer, model) {
   const textByModel = { Claude: row.claude, GPT5: row.gpt, Gemini: row.gemini, DeepSeek: row.deepseek };
   const validity = answer?.requirementValidity || {};
   return splitRequirementText(textByModel[model]).reduce(
     (counts, section) => {
       if (section.type !== "fr" && section.type !== "nfr") return counts;
       section.items.forEach((_, index) => {
-        if (validity[requirementKey(model, section.type, index)] === "valid") counts[section.type] += 1;
+        const baseKey = requirementKey(model, section.type, index);
+        const contentValidKey = requirementMetricKey(model, section.type, index, "contentValid");
+        if (validity[contentValidKey] === "Yes" || validity[baseKey] === "valid") counts.contentValid[section.type] += 1;
+        if (validity[requirementMetricKey(model, section.type, index, "ambiguous")] === "Yes") {
+          counts.ambiguous[section.type] += 1;
+        }
+        if (validity[requirementMetricKey(model, section.type, index, "duplicate")] === "Yes") {
+          counts.duplicate[section.type] += 1;
+        }
       });
       return counts;
     },
-    { fr: 0, nfr: 0 },
+    {
+      contentValid: { fr: 0, nfr: 0 },
+      ambiguous: { fr: 0, nfr: 0 },
+      duplicate: { fr: 0, nfr: 0 },
+    },
   );
 }
 
@@ -169,11 +205,38 @@ function ModelOutput({ name, text, answer, onValidityChange }) {
                   <li key={key}>
                     <p>{item}</p>
                     {(section.type === "fr" || section.type === "nfr") && (
-                      <ChoiceButtons
-                        value={validity[key] || ""}
-                        options={["valid", "not valid"]}
-                        onChange={(value) => onValidityChange(key, value)}
-                      />
+                      <div className="requirement-checks">
+                        <div className="requirement-check">
+                          <span>Content Valid?</span>
+                          <ChoiceButtons
+                            value={validity[requirementMetricKey(name, section.type, index, "contentValid")] || ""}
+                            options={["Yes", "No"]}
+                            onChange={(value) =>
+                              onValidityChange(requirementMetricKey(name, section.type, index, "contentValid"), value)
+                            }
+                          />
+                        </div>
+                        <div className="requirement-check">
+                          <span>Ambiguous?</span>
+                          <ChoiceButtons
+                            value={validity[requirementMetricKey(name, section.type, index, "ambiguous")] || ""}
+                            options={["Yes", "No"]}
+                            onChange={(value) =>
+                              onValidityChange(requirementMetricKey(name, section.type, index, "ambiguous"), value)
+                            }
+                          />
+                        </div>
+                        <div className="requirement-check">
+                          <span>Duplicate?</span>
+                          <ChoiceButtons
+                            value={validity[requirementMetricKey(name, section.type, index, "duplicate")] || ""}
+                            options={["Yes", "No"]}
+                            onChange={(value) =>
+                              onValidityChange(requirementMetricKey(name, section.type, index, "duplicate"), value)
+                            }
+                          />
+                        </div>
+                      </div>
                     )}
                   </li>
                 );
@@ -201,6 +264,54 @@ function ChoiceButtons({ value, options, onChange }) {
       ))}
     </div>
   );
+}
+
+function setCell(sheet, address, value) {
+  sheet[address] = { t: typeof value === "number" ? "n" : "s", v: value };
+}
+
+function ensureSheetRef(sheet, endCell) {
+  const range = XLSX.utils.decode_range(sheet["!ref"]);
+  const end = XLSX.utils.decode_cell(endCell);
+  range.e.c = Math.max(range.e.c, end.c);
+  range.e.r = Math.max(range.e.r, end.r);
+  sheet["!ref"] = XLSX.utils.encode_range(range);
+}
+
+function mergeRange(start, end) {
+  return { s: XLSX.utils.decode_cell(start), e: XLSX.utils.decode_cell(end) };
+}
+
+function resetExportMerges(sheet) {
+  const exportStart = XLSX.utils.decode_col("AA");
+  const exportEnd = XLSX.utils.decode_col("BN");
+  const keepMerge = (merge) => merge.e.c < exportStart || merge.s.c > exportEnd || merge.e.r > 2;
+  sheet["!merges"] = (sheet["!merges"] || []).filter(keepMerge);
+  sheet["!merges"].push(
+    mergeRange("AA1", "AH1"),
+    mergeRange("AI1", "AP1"),
+    mergeRange("AQ1", "AX1"),
+    mergeRange("AY1", "BB2"),
+    mergeRange("BC1", "BF2"),
+    mergeRange("BG1", "BJ2"),
+    mergeRange("BK1", "BN2"),
+  );
+}
+
+function writeExportHeaders(sheet) {
+  resetExportMerges(sheet);
+  setCell(sheet, "AA1", "Content Valid?");
+  setCell(sheet, "AI1", "Ambiguous?");
+  setCell(sheet, "AQ1", "Duplicate?");
+  REQUIREMENT_SUMMARY_FIELDS.forEach((field) => {
+    setCell(sheet, `${field.cell}2`, field.model);
+    setCell(sheet, `${field.cell}3`, field.type.toUpperCase());
+  });
+  ANSWER_FIELDS.forEach((field) => {
+    setCell(sheet, `${field.cell}1`, field.label);
+    setCell(sheet, `${field.cell}3`, field.model);
+  });
+  ensureSheetRef(sheet, "BN3");
 }
 
 function App() {
@@ -301,19 +412,20 @@ function App() {
     if (!workbook || !currentUser) return;
     const copy = XLSX.read(XLSX.write(workbook, { type: "array", bookType: "xlsx" }), { type: "array" });
     const sheet = copy.Sheets[copy.SheetNames[0]];
+    writeExportHeaders(sheet);
     Object.entries(currentUser.answers).forEach(([rowNumber, answer]) => {
       const row = rows.find((item) => String(item.excelRow) === String(rowNumber));
       ANSWER_FIELDS.forEach((field) => {
         const value = answer[field.key];
         if (value !== undefined && value !== "") {
-          sheet[`${field.cell}${rowNumber}`] = { t: "s", v: String(value) };
+          setCell(sheet, `${field.cell}${rowNumber}`, String(value));
         }
       });
       if (row) {
         MODEL_NAMES.forEach((model) => {
-          const counts = countValidRequirements(row, answer, model);
-          Object.entries(VALID_COUNT_CELLS[model]).forEach(([type, column]) => {
-            sheet[`${column}${rowNumber}`] = { t: "n", v: counts[type] };
+          const counts = countRequirementSummaries(row, answer, model);
+          REQUIREMENT_SUMMARY_FIELDS.filter((field) => field.model === model).forEach((field) => {
+            setCell(sheet, `${field.cell}${rowNumber}`, counts[field.metric][field.type]);
           });
         });
       }
