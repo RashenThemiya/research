@@ -35,6 +35,21 @@ const ANSWER_FIELDS = [
   { key: "semanticDeepSeek", label: "Semantic Similarity", cell: "BN", model: "DeepSeek", type: "scale" },
 ];
 const MODEL_NAMES = ["Claude", "GPT5", "Gemini", "DeepSeek"];
+const RAW_EVALUATOR_SHEET = "Raw_Level_Evaluator";
+const RAW_EVALUATOR_HEADERS = [
+  "Sample No",
+  "Original No",
+  "Source File",
+  "Story No",
+  "User Story",
+  "Model",
+  "Requirement Type",
+  "Requirement ID",
+  "Requirement Text",
+  "Valid? (Yes/No)",
+  "Duplicate? (Yes/No)",
+  "Ambiguous? (Yes/No)",
+];
 const REQUIREMENT_SUMMARY_FIELDS = [
   { metric: "contentValid", label: "Content Valid?", model: "Claude", type: "fr", cell: "AA" },
   { metric: "contentValid", label: "Content Valid?", model: "Claude", type: "nfr", cell: "AB" },
@@ -71,7 +86,11 @@ function readStore() {
 }
 
 function saveStore(store) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+  } catch {
+    // Browser storage can fail in private mode; the app can still run for export.
+  }
 }
 
 function slug(value) {
@@ -123,6 +142,18 @@ function parseRequirementItems(body) {
     .filter(Boolean);
   const requirements = lines.filter((line) => /^(FR|NFR)[-\s]?\d+/i.test(line));
   return requirements.length ? requirements : lines.filter((line) => !/requirements|none/i.test(line));
+}
+
+function parseRequirementParts(item, fallbackType, index) {
+  const type = fallbackType.toUpperCase();
+  const match = String(item).match(/^\s*((?:FR|NFR)[-\s]?\d+)\s*(?:\([^)]+\))?\s*[:.-]?\s*(.*)$/i);
+  if (!match) {
+    return { id: `${type}${index + 1}`, text: item };
+  }
+  return {
+    id: match[1].replace(/\s+/g, "").replace("-", "").toUpperCase(),
+    text: match[2].trim() || item,
+  };
 }
 
 function splitRequirementText(text) {
@@ -314,6 +345,57 @@ function writeExportHeaders(sheet) {
   ensureSheetRef(sheet, "BN3");
 }
 
+function buildRawEvaluatorRows(rows, answers) {
+  const modelText = {
+    Claude: "claude",
+    GPT5: "gpt",
+    Gemini: "gemini",
+    DeepSeek: "deepseek",
+  };
+  const rawRows = [RAW_EVALUATOR_HEADERS];
+
+  rows.forEach((row) => {
+    const answer = answers[row.excelRow] || {};
+    const validity = answer.requirementValidity || {};
+
+    MODEL_NAMES.forEach((model) => {
+      splitRequirementText(row[modelText[model]]).forEach((section) => {
+        if (section.type !== "fr" && section.type !== "nfr") return;
+
+        section.items.forEach((item, index) => {
+          const requirement = parseRequirementParts(item, section.type, index);
+          rawRows.push([
+            row.sampleNo,
+            row.originalNo,
+            row.source,
+            row.storyNo,
+            row.story,
+            model,
+            section.type.toUpperCase(),
+            requirement.id,
+            requirement.text,
+            validity[requirementMetricKey(model, section.type, index, "contentValid")] || "",
+            validity[requirementMetricKey(model, section.type, index, "duplicate")] || "",
+            validity[requirementMetricKey(model, section.type, index, "ambiguous")] || "",
+          ]);
+        });
+      });
+    });
+  });
+
+  return rawRows;
+}
+
+function replaceSheet(workbookToUpdate, sheetName, sheet) {
+  const existingIndex = workbookToUpdate.SheetNames.indexOf(sheetName);
+  if (existingIndex >= 0) {
+    workbookToUpdate.Sheets[sheetName] = sheet;
+    return;
+  }
+  workbookToUpdate.SheetNames.push(sheetName);
+  workbookToUpdate.Sheets[sheetName] = sheet;
+}
+
 function App() {
   const [store, setStore] = useState(readStore);
   const [workbook, setWorkbook] = useState(null);
@@ -430,6 +512,7 @@ function App() {
         });
       }
     });
+    replaceSheet(copy, RAW_EVALUATOR_SHEET, XLSX.utils.aoa_to_sheet(buildRawEvaluatorRows(rows, currentUser.answers)));
     XLSX.writeFile(copy, `${slug(currentUser.name)}-${currentUser.phone}-responses.xlsx`);
   }
 
